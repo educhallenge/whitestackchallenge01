@@ -174,7 +174,7 @@ Verificamos navegando a la IP pública de la máquina virtual con puerto 8080. U
 
 ## PASO 6: ACTUALIZACIÓN DE UNA VARIABLE DE ENTORNO EN LA WEAPP
 
-En este paso usamos el mismo Linux local con sistema operativo Ubuntu 22 que se había usado para los pasos 1 y 2. Actualizamos el archivo para aceptar argumentos posicionales y asignarlos a las variables customhost  y customport y usar dichas variables para levantar el servicio web con Flask. El diff con las modificaciones realizadas se muestra a continuación:
+En este paso usamos el mismo Linux local con sistema operativo Ubuntu 22 que se había usado para los pasos 1 y 2. Actualizamos el archivo "application.py" para aceptar argumentos posicionales y asignarlos a las variables customhost  y customport y usar dichas variables para levantar el servicio web con Flask. El diff con las modificaciones realizadas se muestra a continuación:
 ```
 diff application.py application.py.OLD
 5d4
@@ -205,6 +205,28 @@ diff application.py application.py.OLD
 ---
 >       app.debug = True
 >       socketio.run(app, host='0.0.0.0', port=8080)
+```
+También actualizamos el archivo `Dockerfile` para poder usar environment variables que luego se pasarán a las variables customhost y customport de la aplicación.  El contenido del archivo `Dockerfile` se muestra a continuación
+
+```
+FROM python:3.10.14-slim
+LABEL Maintainer="Eduardo Aliaga"
+
+WORKDIR /home/eduardo/tengen-tetris
+COPY . .
+RUN pip install -r requirements.txt
+ENV customhost='192.168.148.148'
+ENV customport=8282
+CMD ["sh", "-c", "python application.py $customhost $customport"]
+```
+
+Ahora creamos una nueva imagen pero esta vez con el tag 1.1 con el comando `docker build -t edual/tetris:1.1` . Validamos que la imagen se creó con el comando `docker images`
+
+Finalmente se hizo login a mi cuenta de DockerHub y luego se hizo push para publicar la imagen en dicho repositorio público.
+
+```
+docker login -u edual
+docker image push edual/tetris:1.1
 ```
 
 ## PASO 7: ACTUALIZACIÓN DE LA WEBAPP DESPLEGADA
