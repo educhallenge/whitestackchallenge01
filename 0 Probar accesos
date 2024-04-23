@@ -1,5 +1,0 @@
-En un Linux local se copió el archivo "challenger-015.yaml" y luego se ejecutó el siguiente comando :
-
- export KUBECONFIG="/home/eduardo/whitestack/challenger-015.yaml"
-
-En el Linux local se usó "kubectl get pods" y se verificó exitosamente la comunicación con el Kubernetes remoto.
