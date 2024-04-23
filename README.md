@@ -85,7 +85,7 @@ spec:
 ```
 Luego se despliega esta configuración con el comando `kubectl apply -f tetris-deploy.yaml` . Se verifica con el comando `kubectl get svc`
 
-También verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
+También verificamos navegando a la IP pública de la máquina virtual con el puerto 30100. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 
 ## PASO 4: CREAR UN HELMET CHART
@@ -103,7 +103,7 @@ Después usamos Helm para instalar la aplicación Tetris usando el comando `helm
 
 Verificamos con los comandos `helm ls` y  `kubectl get svc`
 
-También verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
+También verificamos navegando a la IP pública de la máquina virtual con puerto 30100. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 
 ## PASO 5: DESPLIEGUE DE LA WEBAPP EN UN CLUSTER K8S
@@ -170,7 +170,7 @@ spec:
 ```
 Procedemos a actualizar el despliegue usando el siguiente comando `helm upgrade  mytetris ./tetrischart`
 
-Verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
+Verificamos navegando a la IP pública de la máquina virtual con puerto 30100. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 ## PASO 6: ACTUALIZACIÓN DE UNA VARIABLE DE ENTORNO EN LA WEAPP
 
@@ -230,6 +230,61 @@ docker image push edual/tetris:1.1
 ```
 
 ## PASO 7: ACTUALIZACIÓN DE LA WEBAPP DESPLEGADA
+
+En la virtual machine Ubuntu 22 en Google Cloud se actualizaron los archivos `values.yaml` y `tetris-deploy.yaml` para incluir las environment variables. A continuación el contenido del archivo `values.yaml`
+
+```
+tetris_deploy:
+    name: tetris-deployment
+    label: tetris
+    replicaCount: 1
+    containers:
+        name: tetris
+        image:
+          tag: "edual/tetris:1.1"
+          containerPort: 8686
+          env:
+             customhost: "0.0.0.0"
+             customport: "8686"
+
+tetris_svc:
+    name: tetris-service
+    type: NodePort
+    label: tetris
+    ports:
+        protocol: TCP
+        port: 8686
+        targetPort: 8686
+        nodePort: 30100
+```
+Por brevedad sólo mostramos la nueva sección env  del archivo `tetris-deploy.yaml` 
+```
+    spec:
+      containers:
+      - name: {{ .Values.tetris_deploy.containers.name}}
+        image: {{ .Values.tetris_deploy.containers.image.tag}}
+        ports:
+        - containerPort: {{ .Values.tetris_deploy.containers.image.containerPort}}
+        env:
+          - name: customhost
+            value: "{{ .Values.tetris_deploy.containers.image.env.customhost}}"
+          - name: customport
+            value: "{{ .Values.tetris_deploy.containers.image.env.customport}}"
+```
+
+Como vemos arriba,  en el archivo `values.yaml` se ha definido que se va usar el puerto 8686 para levantar la aplicación Tetris.
+
+Actualizamos el despliegue usando el comando `helm upgrade  mytetris ./tetrischart`
+Con el comando `kubectl get svc` validamos que el puerto 8686 sí se está usando.
+
+```
+kubectl get svc
+NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+kubernetes       ClusterIP   10.96.0.1      <none>        443/TCP          25h
+tetris-service   NodePort    10.97.201.46   <none>        8686:30100/TCP   13h
+```
+
+Verificamos navegando a la IP pública de la máquina virtual con puerto 30100. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 
 ## PASO 8: DOCUMENTACIÓN DE PROCESO
