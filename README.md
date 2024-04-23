@@ -130,7 +130,7 @@ tetris_svc:
         targetPort: 8080
         nodePort: 30100
 ```
-Luego el archivo `tetris-deploy.yaml` que usamos en el paso anterior lo modificamos para que no haya información "hard-coded" sino que todos los valore hagan referencia a una variable del archivo `values.yaml`.  A continuación mostramos el archivo `tetris-deploy.yaml` modificado:
+Luego el archivo `tetris-deploy.yaml` que habíamos usado en el paso anterior lo modificamos para que no haya información "hard-coded" sino que todos los valores hagan referencia a una variable del archivo `values.yaml`.  A continuación mostramos el archivo `tetris-deploy.yaml` modificado:
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -168,10 +168,13 @@ spec:
       targetPort: {{ .Values.tetris_svc.ports.targetPort}}
       nodePort: {{ .Values.tetris_svc.ports.nodePort}}
 ```
+Procedemos a actualizar el despliegue usando el siguiente comando `helm upgrade  mytetris ./tetrischart`
 
-
+Verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 ## PASO 6: ACTUALIZACIÓN DE UNA VARIABLE DE ENTORNO EN LA WEAPP
+
+
 
 
 ## PASO 7: ACTUALIZACIÓN DE LA WEBAPP DESPLEGADA
