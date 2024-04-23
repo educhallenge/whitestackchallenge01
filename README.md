@@ -231,7 +231,7 @@ docker image push edual/tetris:1.1
 
 ## PASO 7: ACTUALIZACIÓN DE LA WEBAPP DESPLEGADA
 
-En la virtual machine Ubuntu 22 en Google Cloud se actualizaron los archivos `values.yaml` y `tetris-deploy.yaml` para incluir las environment variables. A continuación el contenido del archivo `values.yaml`
+En la virtual machine Ubuntu 22 en Google Cloud se actualizaron los archivos `values.yaml` y `tetris-deploy.yaml` para incluir las environment variables. A continuación el contenido del archivo `values.yaml` muestra que también se va a actualizar el tag de la imagen con el valor 1.1
 
 ```
 tetris_deploy:
@@ -284,7 +284,13 @@ kubernetes       ClusterIP   10.96.0.1      <none>        443/TCP          25h
 tetris-service   NodePort    10.97.201.46   <none>        8686:30100/TCP   13h
 ```
 
-Verificamos navegando a la IP pública de la máquina virtual con puerto 30100. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
+También podemos verificar que el pod está usando el nuevo tag 1.1 de la imagen. Usamos el siguiente comando
+```
+ kubectl describe pod tetris | grep Image:
+    Image:          edual/tetris:1.1
+```
+
+Finalmente verificamos navegando a la IP pública de la máquina virtual con puerto 30100. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 
 ## PASO 8: DOCUMENTACIÓN DE PROCESO
