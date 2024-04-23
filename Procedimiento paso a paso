@@ -1,0 +1,3 @@
+En un Linux local se ejecutó "git clone https://github.com/aitorperezzz/tengen-tetris.git" para clonar la aplicación Tetris.
+
+En dicho Linux se ejecutó la aplicación de la siguiente manera "python3 application.py" y se verificó que el modo multijugador funcionaba correctamente
