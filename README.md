@@ -90,6 +90,12 @@ También verificamos navegando a la IP pública de la máquina virtual con puert
 
 ## PASO 4: CREAR UN HELMET CHART
 
+En la virtual machine Ubuntu 22 en Google Cloud se borró el despliegue que se había hecho en el paso 3. Para ello se usaron los siguientes comandos:
+```
+kubectl delete deploy tetris-deployment
+kubectl delete svc tetris-service
+```
+Se instaló Helm en dicha virtual machine
 
 ## PASO 5: DESPLIEGUE DE LA WEBAPP EN UN CLUSTER K8S
 
@@ -102,3 +108,4 @@ También verificamos navegando a la IP pública de la máquina virtual con puert
 
 ## PASO 8: DOCUMENTACIÓN DE PROCESO
 
+La documentación se encuentra en este archvio README.md
