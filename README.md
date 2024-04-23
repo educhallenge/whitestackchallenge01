@@ -31,18 +31,61 @@ CMD [ "python", "./application.py"]
 EXPOSE 8080/tcp
 ```
 
-Ambos archivos `.dockerignore` y  `Dockerfile` se copiaron en el mismo directorio donde estaba la aplicación. Luego se construye la imagen con el siguiente comando `docker build -t edutetris:1.0 edual/tetris:1.0`
+Ambos archivos `.dockerignore` y  `Dockerfile` se copiaron en el mismo directorio donde estaba la aplicación. Luego se construye la imagen con el siguiente comando `docker build -t edual/tetris:1.0`
 
 Validamos que la imagen se creó con el comando `docker images`
 
 Finalmente se hizo login a mi cuenta de DockerHub y luego se hizo push para publicar la imagen en dicho repositorio público.
 
-```docker login -u edual
-docker image push edual/tetris:1.0```
-
+```
+docker login -u edual
+docker image push edual/tetris:1.0
+```
 
 ## PASO 3: CREAR MANIFIESTOS K8S
 
+En una virtual machine Ubuntu 22 en Google Cloud se instaló kubernetes con 1 solo nodo. Luego se creó el archivo `tetrisdeploy.yaml`  que tiene la configuración de 1 deployment y 1 service tal cual se muestra a continuación
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tetris-deployment
+  labels:
+    app: tetris
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tetris
+  template:
+    metadata:
+      labels:
+        app: tetris
+    spec:
+      containers:
+      - name: tetris
+        image: edual/tetris:1.0
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tetris-service
+spec:
+  type: NodePort
+  selector:
+    app: tetris
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30100
+```
+Luego se despliega esta configuración con el comando `kubectl apply -f tetrisdeploy.yaml` . Se verifica con el comando `kubectl get svc`
+
+También verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
 
 ## PASO 4: CREAR UN HELMET CHART
