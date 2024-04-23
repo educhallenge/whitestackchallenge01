@@ -174,12 +174,42 @@ Verificamos navegando a la IP pública de la máquina virtual con puerto 8080. U
 
 ## PASO 6: ACTUALIZACIÓN DE UNA VARIABLE DE ENTORNO EN LA WEAPP
 
-
-
+En este paso usamos el mismo Linux local con sistema operativo Ubuntu 22 que se había usado para los pasos 1 y 2. Actualizamos el archivo para aceptar argumentos posicionales y asignarlos a las variables customhost  y customport y usar dichas variables para levantar el servicio web con Flask. El diff con las modificaciones realizadas se muestra a continuación:
+```
+diff application.py application.py.OLD
+5d4
+< import sys
+105,110d103
+< def main(customhost,customport):
+<         app.debug = True
+< #   socketio.run(app, host='0.0.0.0', port=8080)
+<         socketio.run(app, customhost, customport)
+<
+<
+112,126c105,106
+<     try:
+<        sys.argv[2]
+<     except:
+<        customport=8080
+<     else:
+<        customport=int(sys.argv[2])
+<
+<     try:
+<        sys.argv[1]
+<     except:
+<        customhost='0.0.0.0'
+<     else:
+<        customhost=sys.argv[1]
+<
+<     sys.exit(main(customhost,customport))
+---
+>       app.debug = True
+>       socketio.run(app, host='0.0.0.0', port=8080)
+```
 
 ## PASO 7: ACTUALIZACIÓN DE LA WEBAPP DESPLEGADA
 
 
 ## PASO 8: DOCUMENTACIÓN DE PROCESO
 
-La documentación se encuentra en este archvio README.md
+La documentación se encuentra en este archivo README.md
