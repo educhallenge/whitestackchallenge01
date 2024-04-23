@@ -44,7 +44,7 @@ docker image push edual/tetris:1.0
 
 ## PASO 3: CREAR MANIFIESTOS K8S
 
-En una virtual machine Ubuntu 22 en Google Cloud se instaló kubernetes con 1 solo nodo. Luego se creó el archivo `tetrisdeploy.yaml`  que tiene la configuración de 1 deployment y 1 service tal cual se muestra a continuación
+En una virtual machine Ubuntu 22 en Google Cloud se instaló kubernetes con 1 solo nodo. Luego se creó el archivo `tetris-deploy.yaml`  que tiene la configuración de 1 deployment y 1 service tal cual se muestra a continuación
 
 ```
 apiVersion: apps/v1
@@ -83,7 +83,7 @@ spec:
       targetPort: 8080
       nodePort: 30100
 ```
-Luego se despliega esta configuración con el comando `kubectl apply -f tetrisdeploy.yaml` . Se verifica con el comando `kubectl get svc`
+Luego se despliega esta configuración con el comando `kubectl apply -f tetris-deploy.yaml` . Se verifica con el comando `kubectl get svc`
 
 También verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
 
@@ -95,7 +95,16 @@ En la virtual machine Ubuntu 22 en Google Cloud se borró el despliegue que se h
 kubectl delete deploy tetris-deployment
 kubectl delete svc tetris-service
 ```
-Se instaló Helm en dicha virtual machine
+Se instaló Helm en dicha virtual machine. Luego se creó el template de un chart usando el comando `helm create tetrischart`.  Con dicho comando se crean muchos archivos automáticamente que no vamos a usar. Por ello borramos el archivo `values.yaml` (este archivo lo volveremos a crear en un siguiente paso)  y todos los archivos del directorio `templates`
+
+Luego creamos el archivo `tetris-deploy.yaml` en el directorio `templates`. Dicho archivo es exactamente igual al mostrado en el paso 3.
+
+Después usamos Helm para instalar la aplicación Tetris usando el comando `helm install mytetris ./tetrischart`
+
+Verificamos con los comandos `helm ls` y  `kubectl get svc`
+
+También verificamos navegando a la IP pública de la máquina virtual con puerto 8080. Usando 2 navegadores distintos se probó exitosamente el modo multijugador de Tetris.
+
 
 ## PASO 5: DESPLIEGUE DE LA WEBAPP EN UN CLUSTER K8S
 
