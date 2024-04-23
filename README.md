@@ -18,6 +18,25 @@ En dicho Linux se ejecutó la aplicación de la siguiente manera `python3 applic
 
 ## PASO 2: CREAR UNA IMAGEN DE DOCKER DE LA WEBAPP
 
+En un Linux local con sistema operativo Ubuntu 22 se creó el archivo `.dockerignore` para ignorar los archivos GIT , docker y el directorio __pycache__.  También se creó el siguiente archivo `Dockerfile` para "dockerizar" la aplicación
+
+```FROM python:3.10.12
+LABEL Maintainer="Eduardo Aliaga"
+
+WORKDIR /home/eduardo/tengen-tetris
+COPY . .
+RUN pip install -r requirements.txt
+CMD [ "python", "./application.py"]
+EXPOSE 8080/tcp```
+
+Ambos archivos `.dockerignore` y  `Dockerfile` se copiaron en el mismo directorio donde estaba la aplicación. Luego se construye la imagen con el siguiente comando `docker build -t edutetris:1.0 edual/tetris:1.0`
+
+Validamos que la imagen se creó con el comando `docker images`
+
+Finalmente se hizo login a mi cuenta de DockerHub y luego se hizo push para publicar la imagen en dicho repositorio público.
+
+```docker login -u edual
+docker image push edual/tetris:1.0```
 
 
 ## PASO 3: CREAR MANIFIESTOS K8S
