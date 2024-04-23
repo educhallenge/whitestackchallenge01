@@ -97,7 +97,7 @@ kubectl delete svc tetris-service
 ```
 Se instaló Helm en dicha virtual machine. Luego se creó el template de un chart usando el comando `helm create tetrischart`.  Con dicho comando se crean muchos archivos automáticamente que no vamos a usar. Por ello borramos el archivo `values.yaml` (este archivo lo volveremos a crear en un siguiente paso)  y todos los archivos del directorio `templates`
 
-Luego creamos el archivo `tetris-deploy.yaml` en el directorio `templates`. Dicho archivo es exactamente igual al mostrado en el paso 3.
+Luego creamos el archivo `tetris-deploy.yaml` en el directorio `templates`. El contenido de dicho archivo es exactamente igual al mostrado en el paso 3.
 
 Después usamos Helm para instalar la aplicación Tetris usando el comando `helm install mytetris ./tetrischart`
 
@@ -107,6 +107,68 @@ También verificamos navegando a la IP pública de la máquina virtual con puert
 
 
 ## PASO 5: DESPLIEGUE DE LA WEBAPP EN UN CLUSTER K8S
+
+En la virtual machine Ubuntu 22 en Google Cloud se creó el archivo `values.yaml` con el siguiente contenido
+```
+tetris_deploy:
+    name: tetris-deployment
+    label: tetris
+    replicaCount: 1
+    containers:
+        name: tetris
+        image:
+          tag: "edual/tetris:1.0"
+          containerPort: 8080
+
+tetris_svc:
+    name: tetris-service
+    type: NodePort
+    label: tetris
+    ports:
+        protocol: TCP
+        port: 8080
+        targetPort: 8080
+        nodePort: 30100
+```
+Luego el archivo `tetris-deploy.yaml` que usamos en el paso anterior lo modificamos para que no haya información "hard-coded" sino que todos los valore hagan referencia a una variable del archivo `values.yaml`.  A continuación mostramos el archivo `tetris-deploy.yaml` modificado:
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.tetris_deploy.name}}
+  labels:
+    app: {{ .Values.tetris_deploy.label}}
+spec:
+  replicas: {{ .Values.tetris_deploy.replicaCount}}
+  selector:
+    matchLabels:
+      app: {{ .Values.tetris_deploy.label}}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.tetris_deploy.label}}
+    spec:
+      containers:
+      - name: {{ .Values.tetris_deploy.containers.name}}
+        image: {{ .Values.tetris_deploy.containers.image.tag}}
+        ports:
+        - containerPort: {{ .Values.tetris_deploy.containers.image.containerPort}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.tetris_svc.name}}
+spec:
+  type: {{ .Values.tetris_svc.type}}
+  selector:
+    app: {{ .Values.tetris_svc.label}}
+  ports:
+    - protocol: {{ .Values.tetris_svc.ports.protocol}}
+      port: {{ .Values.tetris_svc.ports.port}}
+      targetPort: {{ .Values.tetris_svc.ports.targetPort}}
+      nodePort: {{ .Values.tetris_svc.ports.nodePort}}
+```
+
 
 
 ## PASO 6: ACTUALIZACIÓN DE UNA VARIABLE DE ENTORNO EN LA WEAPP
